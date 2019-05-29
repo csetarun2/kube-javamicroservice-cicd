@@ -1,4 +1,4 @@
 #!/bin/bash
-kubectl create -f kubernetes/shopfront-service.yaml
-kubectl create -f kubernetes/productcatalogue-service.yaml
-kubectl create -f kubernetes/stockmanager-service.yaml
+kubectl apply -f kubernetes/shopfront-service.yaml
+kubectl apply -f kubernetes/productcatalogue-service.yaml
+kubectl apply -f kubernetes/stockmanager-service.yaml
