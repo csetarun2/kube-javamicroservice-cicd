@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: productcatalogue
-        image: productcatalogue
+        image: iiittarun1625/productcatalogue:latest
         ports:
         - containerPort: 8020
         livenessProbe:
