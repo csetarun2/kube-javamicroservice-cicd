@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: stockmanager
-        image: stockmanager
+        image: iiittarun1625/stockmanager:latest
         ports:
         - containerPort: 8030
         livenessProbe:
