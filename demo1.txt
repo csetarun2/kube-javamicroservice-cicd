@@ -1,0 +1,145 @@
+##Docker installation step by step on ubuntu
+### Install packages to allow apt to use a repository over HTTPS (root account)
+
+apt-get update && apt-get install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+
+### Add Docker apt repository.
+add-apt-repository \
+  "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) \
+  stable"
+  
+  ## Install Docker CE.
+apt-get update && apt-get install docker-ce=18.06.2~ce~3-0~ubuntu
+
+# Setup daemon. (If it doesnt work create folder first /etc/docker then try 
+cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+
+mkdir -p /etc/systemd/system/docker.service.d
+
+# Restart docker.
+systemctl daemon-reload
+systemctl restart docker
+
+
+<<<<<<========================================================>>>>>>>
+
+##First install docker [dockerinstallation] (https://github.com/csetarun2/refdocs/blob/master/dockerinstallation)
+
+This setup for POCs only, For prod setup use any cloud
+## kubeadm installation process [Link](https://kubernetes.io/docs/setup/independent/install-kubeadm/)
+login as root user
+
+apt-get update && apt-get install -y apt-transport-https curl
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+apt-get update
+apt-get install -y kubelet kubeadm kubectl
+apt-mark hold kubelet kubeadm kubectl
+
+systemctl daemon-reload
+systemctl restart kubelet
+
+
+----The above steps are same for all machines in kubernet cluster----
+
+creating single-node cluster [RefLink](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/)
+
+On Master Node:
+
+kubeadm init
+To start using your cluster, you need to run the following as a regular user:
+
+normal user:
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  
+  copy the above kubeadm join token values ..
+ need to create n/w for communication:
+ sysctl net.bridge.bridge-nf-call-iptables=1
+ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+  
+  Login into nodes:
+  execute that above command
+  kubeadm join --token <token> <master-ip>:<master-port> --discovery-token-ca-cert-hash sha256:<hash>
+
+<<<<=================================================================================>>>>
+
+## Installation of Jenkins on ubuntu 18
+
+sudo apt update
+sudo apt install openjdk-8-jdk
+
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt update
+sudo apt install jenkins
+sudo systemctl start jenkins
+sudo systemctl status jenkins
+
+goto browser http://your_server_ip_or_domain:8080
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+adding firewall if needed
+sudo ufw allow 8080
+sudo ufw status
+
+<<<<<=================================================================================>>>>>>>
+
+#Setup docker and kubernets on jenkins machine
+
+First install dokcer and kubeadm setup using 
+https://kubernetes.io/docs/setup/independent/install-kubeadm/
+https://kubernetes.io/docs/setup/cri/
+https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
+
+
+1. need to configure kube config file in jenkins machine for that
+  -> goto kubernetes master -> cat $HOME/.kube/config copy content
+
+  -> goto jenkins machine $> mkdir -p $HOME/.kube
+     vim config 
+       paste the above content
+    execute kubectl get nodes command
+    
+      add jenkins to docker user group
+      usermod -aG docker jenkins
+      chmod 777 /var/run/docker.sock
+
+      copy kubectl config files to jenkins user
+      cp -r ~/.kube ~jenkins/.kube
+      chown -R jenkins ~jenkins/.kube
+    
+    
+
+login your github account and create 3 repos like
+iiittarun1625/productcatalogue
+iiittarun1625/stockmanager
+iiittarun1625/shopfront
+then 
+
+
+##Project1 JavaMicroService CICD Jenkins - Kubernetes
+
+Create Jenkins Pipeline:
+docker login --username=iiittarun1625 --password=passwd
+rm -rf kube-*/
+git clone https://github.com/csetarun2/kube-javamicroservice-cicd.git/
+cd kube-javamicroservice-cicd
+sh build_all.sh
+sh deploy.sh
+
+   ->   execute job
