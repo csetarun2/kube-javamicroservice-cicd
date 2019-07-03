@@ -127,7 +127,7 @@ https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
     
     
 
-login your github account and create 3 repos like
+login your dockerhub account and create 3 repos like
 iiittarun1625/productcatalogue
 iiittarun1625/stockmanager
 iiittarun1625/shopfront
